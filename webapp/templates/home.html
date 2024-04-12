@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block styles %}
+
+{% endblock %}
+
+{% block content %}
+{#    <div hx-get="htmx/" hx-trigger="every 2s" hx-target="#thetarget">#}
+{#        [Here Mouse, Mouse!]#}
+{#    </div>#}
+    <br>
+    <div id="form">
+        <input type="text" id="input">
+        <button onclick="test()">Test</button>
+    </div>
+
+    
+
+{#    <div id="thetarget">?</div>#}
+{% endblock %}
+
+
+{% block JS %}
+    <script>
+        document.getElementById('input').addEventListener('keypress', function(event) {
+            if (event.keyCode === 13) {  // 13 is the key code for Enter
+                event.preventDefault();  // Prevent the default action to stop submitting the form
+                $('button').click();
+            }
+        });
+
+        async function get_columns(){
+            try {
+                let tester = $("#input").val()
+
+                let response = await fetch(`api/v1/generic/${tester}/columns` )
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                let data = await response.json();
+                console.log(data);
+                return data
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        async function test() {
+            let tester = $("#input").val()
+            let columns = await get_columns()
+
+            $("#table-primary").DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: `api/v1/${tester}/`,
+                columns: columns
+            })
+        }
+    </script>
+
+{% endblock %}
