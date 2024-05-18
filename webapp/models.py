@@ -47,24 +47,8 @@ class ActionMap(models.Model):
         verbose_name_plural = 'Action Map'
 
 
-class CoachStates(models.Model):
-    coach_br_id = models.CharField(max_length=10, blank=True, null=True)
-    team_br_id = models.CharField(max_length=3, blank=True, null=True)
-    start_date = models.DateField(blank=True, null=True)
-    end_date = models.DateField(blank=True, null=True)
-
-    def __str__(self):
-        # coach and start date to end date
-        return self.coach_br_id + ' ' + self.start_date.strftime("%Y-%m-%d %H:%M:%S") + ' to ' + self.end_date.strftime("%Y-%m-%d %H:%M:%S")
-    
-    class Meta:
-        managed = False
-        db_table = 'CoachStates'
-        verbose_name_plural = 'Coach States'
-
-
 class Coaches(models.Model):
-    br_id = models.CharField(max_length=10, blank=True, null=True)
+    br_id = models.CharField(max_length=10, unique=True)
     first_name = models.CharField(max_length=35, blank=True, null=True)
     last_name = models.CharField(max_length=35, blank=True, null=True)
     birthdate = models.DateField(blank=True, null=True)
@@ -79,10 +63,56 @@ class Coaches(models.Model):
         db_table = 'Coaches'
         verbose_name_plural = 'Coaches'
 
+class Teams(models.Model):
+    name = models.CharField(max_length=50, blank=True, null=True)
+    br_id = models.CharField(max_length=3, unique=True)
+    nba = models.IntegerField(blank=True, null=True)
+    baa = models.IntegerField(blank=True, null=True)
+    aba = models.IntegerField(blank=True, null=True)
+    season_start_year = models.CharField(max_length=4, blank=True, null=True)
+    season_end_year = models.CharField(max_length=4, blank=True, null=True)
+    location = models.CharField(max_length=30, blank=True, null=True)
+
+    def __str__(self):
+        return self.name + ' - ' + self.season_start_year + ' to ' + self.season_end_year
+    
+    class Meta:
+        managed = False
+        db_table = 'Teams'
+        verbose_name_plural = 'Teams'
+
+
+class Players(models.Model):
+    br_id = models.CharField(max_length=9, blank=True, null=True, unique=True)
+    first_name = models.CharField(max_length=35, blank=True, null=True)
+    last_name = models.CharField(max_length=35, blank=True, null=True)
+    city = models.CharField(max_length=30, blank=True, null=True)
+    territory = models.CharField(max_length=30, blank=True, null=True)
+    country = models.CharField(max_length=30, blank=True, null=True)
+    full_name = models.CharField(max_length=50, blank=True, null=True)
+    suffix = models.CharField(max_length=5, blank=True, null=True)
+    year_start = models.CharField(max_length=4, blank=True, null=True)
+    year_end = models.CharField(max_length=4, blank=True, null=True)
+    position = models.CharField(max_length=5, blank=True, null=True)
+    height_str = models.CharField(max_length=4, blank=True, null=True)
+    height_in = models.IntegerField(blank=True, null=True)
+    weight = models.IntegerField(blank=True, null=True)
+    birth_date = models.DateField(blank=True, null=True)
+    colleges = models.JSONField(blank=True, null=True)
+
+    def __str__(self):
+        return self.first_name + ' ' + self.last_name
+    
+    class Meta:
+        managed = False
+        db_table = 'Players'
+        verbose_name_plural = 'Players'
+        
+
 class Games(models.Model):
-    br_id = models.CharField(max_length=12, blank=True, null=True)
-    home_team_br_id = models.CharField(max_length=3, blank=True, null=True)
-    away_team_br_id = models.CharField(max_length=3, blank=True, null=True)
+    br_id = models.CharField(max_length=12, unique=True)
+    home_team_br_id = models.ForeignKey(Teams, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True, related_name='home_team')
+    away_team_br_id = models.ForeignKey(Teams, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True, related_name='away_team' )
     home_team_points = models.IntegerField(blank=True, null=True)
     away_team_points = models.IntegerField(blank=True, null=True)
     date_time = models.DateTimeField(blank=True, null=True)
@@ -103,10 +133,26 @@ class Games(models.Model):
     def __str__(self):
         return self.date_time.strftime("%Y-%m-%d %H:%M:%S") + ' - ' + self.home_team_br_id + ' vs ' + self.away_team_br_id
 
+
+class CoachStates(models.Model):
+    coach_br_id = models.ForeignKey(Coaches, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
+    team_br_id = models.ForeignKey(Teams, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        # coach and start date to end date
+        return self.coach_br_id + ' ' + self.start_date.strftime("%Y-%m-%d %H:%M:%S") + ' to ' + self.end_date.strftime("%Y-%m-%d %H:%M:%S")
+    
+    class Meta:
+        managed = False
+        db_table = 'CoachStates'
+        verbose_name_plural = 'Coach States'
+
 class PlayActions(models.Model):
     play_id = models.IntegerField(blank=True, null=True)
-    player_br_id = models.CharField(max_length=9, blank=True, null=True)
-    team_br_id = models.CharField(max_length=3, blank=True, null=True)
+    player_br_id = models.ForeignKey(Players, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
+    team_br_id = models.ForeignKey(Teams, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
     action_id = models.IntegerField(blank=True, null=True)
     code = models.CharField(max_length=60,blank=True, null=True)
 
@@ -138,10 +184,10 @@ class PlayLoadErrors(models.Model):
 
 
 class PlayerGameHalfStats(models.Model):
-    player_br_id = models.CharField(max_length=9, blank=True, null=True)
-    game_br_id = models.CharField(max_length=12, blank=True, null=True)
-    team_br_id = models.CharField(max_length=3, blank=True, null=True)
-    opponent_br_id = models.CharField(max_length=3, blank=True, null=True)
+    player_br_id = models.ForeignKey(Players, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
+    game_br_id = models.ForeignKey(Games, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
+    team_br_id = models.ForeignKey(Teams, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
+    opponent_br_id = models.ForeignKey(Teams, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True, related_name='idk1')
     quarter = models.IntegerField(blank=True, null=True)
     minutes_played = models.IntegerField(blank=True, null=True)
     field_goals = models.IntegerField(blank=True, null=True)
@@ -172,10 +218,10 @@ class PlayerGameHalfStats(models.Model):
 
 
 class PlayerGameQuarterStats(models.Model):
-    player_br_id = models.CharField(max_length=9, blank=True, null=True)
-    game_br_id = models.CharField(max_length=12, blank=True, null=True)
-    team_br_id = models.CharField(max_length=3, blank=True, null=True)
-    opponent_br_id = models.CharField(max_length=3, blank=True, null=True)
+    player_br_id = models.ForeignKey(Players, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
+    game_br_id = models.ForeignKey(Games, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
+    team_br_id = models.ForeignKey(Teams, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True, related_name='idk2')
+    opponent_br_id = models.ForeignKey(Teams, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True, related_name='opponent')
     quarter = models.IntegerField(blank=True, null=True)
     minutes_played = models.IntegerField(blank=True, null=True)
     field_goals = models.IntegerField(blank=True, null=True)
@@ -206,10 +252,10 @@ class PlayerGameQuarterStats(models.Model):
 
 
 class PlayerGameStats(models.Model):
-    player_br_id = models.CharField(max_length=9, blank=True, null=True)
-    game_br_id = models.CharField(max_length=12, blank=True, null=True)
-    team_br_id = models.CharField(max_length=3, blank=True, null=True)
-    opponent_team_br_id = models.CharField(max_length=3, blank=True, null=True)
+    player_br_id = models.ForeignKey(Players, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
+    game_br_id = models.ForeignKey(Games, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
+    team_br_id = models.ForeignKey(Teams, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True, related_name='team')
+    opponent_team_br_id = models.ForeignKey(Teams, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True, related_name='opponent_team')
     played = models.IntegerField(blank=True, null=True)
     started = models.IntegerField(blank=True, null=True)
     minutes_played = models.IntegerField(blank=True, null=True)
@@ -256,7 +302,7 @@ class PlayerGameStats(models.Model):
 
 
 class PlayerStates(models.Model):
-    player_br_id = models.CharField(max_length=9, blank=True, null=True)
+    player_br_id = models.ForeignKey(Players, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
     team_id = models.IntegerField(blank=True, null=True)
     jersey_no = models.IntegerField(blank=True, null=True)
     position = models.CharField(max_length=3, blank=True, null=True)
@@ -272,35 +318,10 @@ class PlayerStates(models.Model):
         verbose_name_plural = 'Player States'
 
 
-class Players(models.Model):
-    br_id = models.CharField(max_length=9, blank=True, null=True, db_comment='TEST')
-    first_name = models.CharField(max_length=35, blank=True, null=True)
-    last_name = models.CharField(max_length=35, blank=True, null=True)
-    city = models.CharField(max_length=30, blank=True, null=True)
-    territory = models.CharField(max_length=30, blank=True, null=True)
-    country = models.CharField(max_length=30, blank=True, null=True)
-    full_name = models.CharField(max_length=50, blank=True, null=True)
-    suffix = models.CharField(max_length=5, blank=True, null=True)
-    year_start = models.CharField(max_length=4, blank=True, null=True)
-    year_end = models.CharField(max_length=4, blank=True, null=True)
-    position = models.CharField(max_length=5, blank=True, null=True)
-    height_str = models.CharField(max_length=4, blank=True, null=True)
-    height_in = models.IntegerField(blank=True, null=True)
-    weight = models.IntegerField(blank=True, null=True)
-    birth_date = models.DateField(blank=True, null=True)
-    colleges = models.JSONField(blank=True, null=True)
-
-    def __str__(self):
-        return self.first_name + ' ' + self.last_name
-    
-    class Meta:
-        managed = False
-        db_table = 'Players'
-        verbose_name_plural = 'Players'
 
 
 class Plays(models.Model):
-    game_br_id = models.CharField(max_length=12, blank=True, null=True)
+    game_br_id = models.ForeignKey(Games, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
     quarter = models.IntegerField(blank=True, null=True)
     clock_time = models.CharField(max_length=7, blank=True, null=True)
     distance_feet = models.IntegerField(blank=True, null=True)
@@ -322,15 +343,15 @@ class Seasons(models.Model):
     rebounds_leader = models.IntegerField(blank=True, null=True)
     assists_leader = models.IntegerField(blank=True, null=True)
     win_shares_leader = models.IntegerField(blank=True, null=True)
-    br_id = models.CharField(max_length=8, blank=True, null=True)
+    br_id = models.CharField(max_length=8, unique=True)
     active = models.CharField(max_length=8, blank=True, null=True)
-    champion_br_id = models.CharField(max_length=20, blank=True, null=True)
-    mvp_br_id = models.CharField(max_length=20, blank=True, null=True)
-    roy_br_id = models.CharField(max_length=20, blank=True, null=True)
-    scoring_leader_br_id = models.CharField(max_length=20, blank=True, null=True)
-    rebounding_leader_br_id = models.CharField(max_length=20, blank=True, null=True)
-    assists_leader_br_id = models.CharField(max_length=20, blank=True, null=True)
-    winshares_leader_br_id = models.CharField(max_length=20, blank=True, null=True)
+    champion_br_id = models.ForeignKey(Teams, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
+    mvp_br_id = models.ForeignKey(Players, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True, related_name='mvp')
+    roy_br_id = models.ForeignKey(Players, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True, related_name='roy')
+    scoring_leader_br_id = models.ForeignKey(Players, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True, related_name='scoring_leader')
+    rebounding_leader_br_id = models.ForeignKey(Players, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True, related_name='rebounding_leader')
+    assists_leader_br_id = models.ForeignKey(Players, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True, related_name='assists_leader')
+    winshares_leader_br_id = models.ForeignKey(Players, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True, related_name='winshares_leader')
     scoring_leader_points = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
@@ -344,8 +365,8 @@ class Seasons(models.Model):
 
 class TeamGameHalfStats(models.Model):
     game_id = models.IntegerField(blank=True, null=True)
-    game_br_id = models.CharField(max_length=12, blank=True, null=True)
-    team_br_id = models.CharField(max_length=3, blank=True, null=True)
+    game_br_id = models.ForeignKey(Games, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
+    team_br_id = models.ForeignKey(Teams, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
     half = models.IntegerField(blank=True, null=True)
     minutes_played = models.IntegerField(blank=True, null=True)
     field_goals = models.IntegerField(blank=True, null=True)
@@ -377,8 +398,8 @@ class TeamGameHalfStats(models.Model):
 
 class TeamGameQuarterStats(models.Model):
     game_id = models.IntegerField(blank=True, null=True)
-    game_br_id = models.CharField(max_length=12, blank=True, null=True)
-    team_br_id = models.CharField(max_length=3, blank=True, null=True)
+    game_br_id = models.ForeignKey(Games, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
+    team_br_id = models.ForeignKey(Teams, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
     quarter = models.IntegerField(blank=True, null=True)
     minutes_played = models.IntegerField(blank=True, null=True)
     field_goals = models.IntegerField(blank=True, null=True)
@@ -410,8 +431,8 @@ class TeamGameQuarterStats(models.Model):
 
 class TeamGameStats(models.Model):
     game_id = models.IntegerField(blank=True, null=True)
-    game_br_id = models.CharField(max_length=12, blank=True, null=True)
-    team_br_id = models.CharField(max_length=3, blank=True, null=True)
+    game_br_id = models.ForeignKey(Games, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
+    team_br_id = models.ForeignKey(Teams, to_field='br_id', on_delete=models.CASCADE, blank=True, null=True)
     minutes_played = models.IntegerField(blank=True, null=True)
     field_goals = models.IntegerField(blank=True, null=True)
     field_goal_attempts = models.IntegerField(blank=True, null=True)
@@ -457,20 +478,3 @@ class TeamGameStats(models.Model):
         db_table = 'TeamGameStats'
         verbose_name_plural = 'Team Game Stats'
 
-class Teams(models.Model):
-    name = models.CharField(max_length=50, blank=True, null=True)
-    br_id = models.CharField(max_length=3, blank=True, null=True)
-    nba = models.IntegerField(blank=True, null=True)
-    baa = models.IntegerField(blank=True, null=True)
-    aba = models.IntegerField(blank=True, null=True)
-    season_start_year = models.CharField(max_length=4, blank=True, null=True)
-    season_end_year = models.CharField(max_length=4, blank=True, null=True)
-    location = models.CharField(max_length=30, blank=True, null=True)
-
-    def __str__(self):
-        return self.name + ' - ' + self.season_start_year + ' to ' + self.season_end_year
-    
-    class Meta:
-        managed = False
-        db_table = 'Teams'
-        verbose_name_plural = 'Teams'
