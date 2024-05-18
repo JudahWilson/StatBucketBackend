@@ -23,7 +23,9 @@
     <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
     <!-- DataTables -->
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    
+    <!-- Plotly -->
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js" charset="utf-8"></script>
+
     <title>{% block title %}{{ title }}{% endblock %}</title>
   </head>
 
@@ -32,7 +34,6 @@
     <div>
         {% block content %}{% endblock %}
     </div>
-
     {% block JS %}{% endblock %}
   </body>
 </html>

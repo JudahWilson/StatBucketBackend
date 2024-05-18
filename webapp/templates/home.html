@@ -5,59 +5,122 @@
 {% endblock %}
 
 {% block content %}
-{#    <div hx-get="htmx/" hx-trigger="every 2s" hx-target="#thetarget">#}
-{#        [Here Mouse, Mouse!]#}
-{#    </div>#}
-    <br>
-    <div id="form">
-        <input type="text" id="input">
-        <button onclick="test()">Test</button>
+<!-- <div hx-get="htmx/" hx-trigger="every 2s" hx-target="#thetarget">
+        [Here Mouse, Mouse!]
     </div>
+    <div id="thetarget">?</div>
+    <br> -->
+<div id="form">
+    <label for="input">stuff</label>
+    <input type="text" id="input">
+    <button onclick="datatabletest()">Test</button>
+</div>
 
-    
+<table id="table-primary"></table>
 
-{#    <div id="thetarget">?</div>#}
+<div id="tester" style="width:600px;height:250px;"></div>
+
 {% endblock %}
 
 
 {% block JS %}
-    <script>
-        document.getElementById('input').addEventListener('keypress', function(event) {
-            if (event.keyCode === 13) {  // 13 is the key code for Enter
-                event.preventDefault();  // Prevent the default action to stop submitting the form
-                $('button').click();
-            }
-        });
-
-        async function get_columns(){
-            try {
-                let tester = $("#input").val()
-
-                let response = await fetch(`api/v1/generic/${tester}/columns` )
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                let data = await response.json();
-                console.log(data);
-                return data
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
+<script>
+    document.getElementById('input').addEventListener('keypress', function (event) {
+        if (event.keyCode === 13) {  // 13 is the key code for Enter
+            event.preventDefault();  // Prevent the default action to stop submitting the form
+            $('button').click();
         }
+    });
 
-        async function test() {
+    async function get_columns() {
+        try {
             let tester = $("#input").val()
-            let columns = await get_columns()
 
-            $("#table-primary").DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: `api/v1/${tester}/`,
-                columns: columns
-            })
+            let response = await fetch(`api/v1/generic/${tester}/columns`)
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            let data = await response.json();
+            console.log(data);
+            return data
+        } catch (error) {
+            console.error('Error fetching data:', error);
         }
-    </script>
+    }
+
+    async function datatabletest() {
+        let tester = $("#input").val()
+        let columns = await get_columns()
+
+        $("#table-primary").DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: `api/v1/generic/${tester}/`,
+                type: "GET",
+                data: function (d, settings) {
+
+                    // page
+                    if (d.start == 0) {
+                        d.page = 1
+                    } else {
+                        d.page = d.start / d.length + 1
+                    }
+                    console.log(d.page)
+
+                    // Order by
+                    // TODO not sorting yet, also toggling the incorrect column
+                    if (d.order && d.order.length > 0) {
+                        let columnIndex = d.order[0].column;  // Get the index of the column being sorted
+                        let columnName = settings.aoColumns[columnIndex].data;
+                        d.order_by = columnName
+                    }
+
+                    
+                }
+            },
+            columns: columns
+        })
+    }
+
+    TESTER = document.getElementById('tester');
+    
+    data = [
+        {
+            type: 'scatter',  // all "scatter" attributes: https://plotly.com/javascript/reference/#scatter
+            x: [1, 2, 3],     // more about "x": #scatter-x
+            y: [3, 1, 6],     // #scatter-y
+            marker: {         // marker is an object, valid marker keys: #scatter-marker
+                color: 'rgb(16, 32, 77)' // more about "marker.color": #scatter-marker-color
+            }
+        },
+        {
+            type: 'bar',      // all "bar" chart attributes: #bar
+            x: [1, 2, 3],     // more about "x": #bar-x
+            y: [3, 1, 6],     // #bar-y
+            name: 'bar chart example' // #bar-name
+        }
+    ];
+
+    layout = {                     // all "layout" attributes: #layout
+        title: 'simple example',  // more about "layout.title": #layout-title
+        xaxis: {                  // all "layout.xaxis" attributes: #layout-xaxis
+            title: 'time'         // more about "layout.xaxis.title": #layout-xaxis-title
+        },
+        annotations: [            // all "annotation" attributes: #layout-annotations
+            {
+                text: 'simple annotation',    // #layout-annotations-text
+                x: 0,                         // #layout-annotations-x
+                xref: 'paper',                // #layout-annotations-xref
+                y: 0,                         // #layout-annotations-y
+                yref: 'paper'                 // #layout-annotations-yref
+            }
+        ]
+    }
+    
+    Plotly.newPlot(TESTER, data, layout);
+</script>
 
 {% endblock %}
