@@ -5,7 +5,7 @@ from django.db import models
 
 def get_model_names():
     """
-    Used to dynamically get a list of all models which is useful for my API
+    Get a list of all models' names as a strings
     """
     import inspect
     class_names = []
@@ -45,7 +45,6 @@ class ActionMap(models.Model):
         managed = False
         db_table = 'ActionMap'
         verbose_name_plural = 'Action Map'
-
 
 class CoachStates(models.Model):
     coach_br_id = models.CharField(max_length=10, blank=True, null=True)
@@ -143,11 +142,12 @@ class PlayerGameHalfStats(models.Model):
     team_br_id = models.CharField(max_length=3, blank=True, null=True)
     opponent_br_id = models.CharField(max_length=3, blank=True, null=True)
     quarter = models.IntegerField(blank=True, null=True)
-    minutes_played = models.IntegerField(blank=True, null=True)
+    seconds_played = models.IntegerField(blank=True, null=True)
     field_goals = models.IntegerField(blank=True, null=True)
     field_goal_attempts = models.IntegerField(blank=True, null=True)
     field_goal_percentage = models.DecimalField(max_digits=4, decimal_places=3, blank=True, null=True)
     three_pointers = models.IntegerField(blank=True, null=True)
+    three_pointer_attempts = models.IntegerField(blank=True, null=True)
     three_pointer_percentage = models.DecimalField(max_digits=4, decimal_places=3, blank=True, null=True)
     free_throws = models.IntegerField(blank=True, null=True)
     free_throw_attempts = models.IntegerField(blank=True, null=True)
@@ -155,6 +155,7 @@ class PlayerGameHalfStats(models.Model):
     rebounds = models.IntegerField(blank=True, null=True)
     offensive_rebounds = models.IntegerField(blank=True, null=True)
     defensive_rebounds = models.IntegerField(blank=True, null=True)
+    assists = models.IntegerField(blank=True, null=True)
     steals = models.IntegerField(blank=True, null=True)
     blocks = models.IntegerField(blank=True, null=True)
     turnovers = models.IntegerField(blank=True, null=True)
@@ -177,11 +178,12 @@ class PlayerGameQuarterStats(models.Model):
     team_br_id = models.CharField(max_length=3, blank=True, null=True)
     opponent_br_id = models.CharField(max_length=3, blank=True, null=True)
     quarter = models.IntegerField(blank=True, null=True)
-    minutes_played = models.IntegerField(blank=True, null=True)
+    seconds_played = models.IntegerField(blank=True, null=True)
     field_goals = models.IntegerField(blank=True, null=True)
     field_goal_attempts = models.IntegerField(blank=True, null=True)
     field_goal_percentage = models.DecimalField(max_digits=4, decimal_places=3, blank=True, null=True)
     three_pointers = models.IntegerField(blank=True, null=True)
+    three_pointer_attempts = models.IntegerField(blank=True, null=True)
     three_pointer_percentage = models.DecimalField(max_digits=4, decimal_places=3, blank=True, null=True)
     free_throws = models.IntegerField(blank=True, null=True)
     free_throw_attempts = models.IntegerField(blank=True, null=True)
@@ -189,6 +191,7 @@ class PlayerGameQuarterStats(models.Model):
     rebounds = models.IntegerField(blank=True, null=True)
     offensive_rebounds = models.IntegerField(blank=True, null=True)
     defensive_rebounds = models.IntegerField(blank=True, null=True)
+    assists = models.IntegerField(blank=True, null=True)
     steals = models.IntegerField(blank=True, null=True)
     blocks = models.IntegerField(blank=True, null=True)
     turnovers = models.IntegerField(blank=True, null=True)
@@ -203,6 +206,41 @@ class PlayerGameQuarterStats(models.Model):
         managed = False
         db_table = 'PlayerGameQuarterStats'
         verbose_name_plural = 'Player Game Quarter Stats'
+        
+class PlayerGameOvertimeStats(models.Model):
+    player_br_id = models.CharField(max_length=9, blank=True, null=True)
+    game_br_id = models.CharField(max_length=12, blank=True, null=True)
+    team_br_id = models.CharField(max_length=3, blank=True, null=True)
+    opponent_br_id = models.CharField(max_length=3, blank=True, null=True)
+    overtime = models.IntegerField(blank=True, null=True)
+    seconds_played = models.IntegerField(blank=True, null=True)
+    field_goals = models.IntegerField(blank=True, null=True)
+    field_goal_attempts = models.IntegerField(blank=True, null=True)
+    field_goal_percentage = models.DecimalField(max_digits=4, decimal_places=3, blank=True, null=True)
+    three_pointers = models.IntegerField(blank=True, null=True)
+    three_pointer_attempts = models.IntegerField(blank=True, null=True)
+    three_pointer_percentage = models.DecimalField(max_digits=4, decimal_places=3, blank=True, null=True)
+    free_throws = models.IntegerField(blank=True, null=True)
+    free_throw_attempts = models.IntegerField(blank=True, null=True)
+    free_throw_percentage = models.DecimalField(max_digits=4, decimal_places=3, blank=True, null=True)
+    rebounds = models.IntegerField(blank=True, null=True)
+    offensive_rebounds = models.IntegerField(blank=True, null=True)
+    defensive_rebounds = models.IntegerField(blank=True, null=True)
+    assists = models.IntegerField(blank=True, null=True)
+    steals = models.IntegerField(blank=True, null=True)
+    blocks = models.IntegerField(blank=True, null=True)
+    turnovers = models.IntegerField(blank=True, null=True)
+    personal_fouls = models.IntegerField(blank=True, null=True)
+    points = models.IntegerField(blank=True, null=True)
+    plus_minus = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.player_br_id + ' - ' + self.game_br_id + ' - ' + self.overtime
+    
+    class Meta:
+        managed = False
+        db_table = 'PlayerGameOvertimeStats'
+        verbose_name_plural = 'Player Game Overtime Stats'
 
 
 class PlayerGameStats(models.Model):
@@ -211,12 +249,14 @@ class PlayerGameStats(models.Model):
     team_br_id = models.CharField(max_length=3, blank=True, null=True)
     opponent_team_br_id = models.CharField(max_length=3, blank=True, null=True)
     played = models.IntegerField(blank=True, null=True)
+    reason_for_absence = models.CharField(max_length=20, blank=True, null=True)
     started = models.IntegerField(blank=True, null=True)
-    minutes_played = models.IntegerField(blank=True, null=True)
+    seconds_played = models.IntegerField(blank=True, null=True)
     field_goals = models.IntegerField(blank=True, null=True)
     field_goal_attempts = models.IntegerField(blank=True, null=True)
     field_goal_percentage = models.DecimalField(max_digits=4, decimal_places=3, blank=True, null=True)
     three_pointers = models.IntegerField(blank=True, null=True)
+    three_pointer_attempts = models.IntegerField(blank=True, null=True)
     three_pointer_percentage = models.DecimalField(max_digits=4, decimal_places=3, blank=True, null=True)
     free_throws = models.IntegerField(blank=True, null=True)
     free_throw_attempts = models.IntegerField(blank=True, null=True)
@@ -224,6 +264,7 @@ class PlayerGameStats(models.Model):
     rebounds = models.IntegerField(blank=True, null=True)
     offensive_rebounds = models.IntegerField(blank=True, null=True)
     defensive_rebounds = models.IntegerField(blank=True, null=True)
+    assists = models.IntegerField(blank=True, null=True)
     steals = models.IntegerField(blank=True, null=True)
     blocks = models.IntegerField(blank=True, null=True)
     turnovers = models.IntegerField(blank=True, null=True)
@@ -407,6 +448,39 @@ class TeamGameQuarterStats(models.Model):
         managed = False
         db_table = 'TeamGameQuarterStats'
         verbose_name_plural = 'Team Game Quarter Stats'
+        
+class TeamGameOvertimeStats(models.Model):
+    game_id = models.IntegerField(blank=True, null=True)
+    game_br_id = models.CharField(max_length=12, blank=True, null=True)
+    team_br_id = models.CharField(max_length=3, blank=True, null=True)
+    overtime = models.IntegerField(blank=True, null=True)
+    minutes_played = models.IntegerField(blank=True, null=True)
+    field_goals = models.IntegerField(blank=True, null=True)
+    field_goal_attempts = models.IntegerField(blank=True, null=True)
+    field_goal_percentage = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    three_pointers = models.IntegerField(blank=True, null=True)
+    three_pointer_attempts = models.IntegerField(blank=True, null=True)
+    three_pointer_percentage = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    free_throws = models.IntegerField(blank=True, null=True)
+    free_throw_attempts = models.IntegerField(blank=True, null=True)
+    free_throw_percentage = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    rebounds = models.IntegerField(blank=True, null=True)
+    offensive_rebounds = models.IntegerField(blank=True, null=True)
+    defensive_rebounds = models.IntegerField(blank=True, null=True)
+    assists = models.IntegerField(blank=True, null=True)
+    steals = models.IntegerField(blank=True, null=True)
+    blocks = models.IntegerField(blank=True, null=True)
+    turnovers = models.IntegerField(blank=True, null=True)
+    personal_fouls = models.IntegerField(blank=True, null=True)
+    points = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.game_id + ' - ' + self.overtime
+    
+    class Meta:
+        managed = False
+        db_table = 'TeamGameOvertimeStats'
+        verbose_name_plural = 'Team Game Overtime Stats'
 
 class TeamGameStats(models.Model):
     game_id = models.IntegerField(blank=True, null=True)

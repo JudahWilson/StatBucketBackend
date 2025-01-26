@@ -2,6 +2,9 @@ from django_filters import rest_framework as filters
 from webapp.models import *
 
 def filter_generator(filter_instance):
+    '''
+    Set a filter for each field in the model
+    '''
     for field_name in filter_instance.Meta.model._meta.fields:
             if isinstance(field_name, models.CharField) or isinstance(field_name, models.TextField):
                 # For character-based fields, add icontains and iexact filters
@@ -29,6 +32,9 @@ def filter_generator(filter_instance):
                 filter_instance.filters[f'{field_name.name}__lt'] = filters.DateFilter(field_name=field_name.name, lookup_expr='lt')
 
 class UniversalFilter(filters.FilterSet):
+    '''
+    The filter set for API views that automatically create a filter for every field in the model
+    '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         filter_generator(self)

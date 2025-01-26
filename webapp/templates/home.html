@@ -16,6 +16,7 @@
     <button onclick="datatabletest()">Test</button>
 </div>
 
+
 <table id="table-primary"></table>
 
 <div id="tester" style="width:600px;height:250px;"></div>
@@ -32,6 +33,11 @@
         }
     });
 
+    /**********************************************
+     * DATATABLES
+     **********************************************/
+    //#region datatable
+    
     async function get_columns() {
         try {
             let tester = $("#input").val()
@@ -50,6 +56,7 @@
         }
     }
 
+    
     async function datatabletest() {
         let tester = $("#input").val()
         let columns = await get_columns()
@@ -62,6 +69,8 @@
                 type: "GET",
                 data: function (d, settings) {
 
+                    // column filter
+                    
                     // page
                     if (d.start == 0) {
                         d.page = 1
@@ -71,7 +80,6 @@
                     console.log(d.page)
 
                     // Order by
-                    // TODO not sorting yet, also toggling the incorrect column
                     if (d.order && d.order.length > 0) {
                         let columnIndex = d.order[0].column;  // Get the index of the column being sorted
                         let columnName = settings.aoColumns[columnIndex].data;
@@ -84,7 +92,13 @@
             columns: columns
         })
     }
+    //#endregion
 
+
+    /**********************************************
+     * CHARTS
+     **********************************************/
+    //#region charts
     TESTER = document.getElementById('tester');
     
     data = [
@@ -121,6 +135,8 @@
     }
     
     Plotly.newPlot(TESTER, data, layout);
+
+    //#endregion
 </script>
 
 {% endblock %}

@@ -60,13 +60,15 @@ class InternalAPIViewSet(viewsets.ModelViewSet):
         # order_by and desc
         order_by = self.request.query_params.get('order_by')            
         if order_by:
-            if self.request.query_params.get('order[0][column]') == 'desc':
+            if self.request.query_params.get('order[0][dir]') == 'desc':
                 order_by = '-' + order_by
             queryset = queryset.order_by(order_by)
 
         
 
         return queryset
+    
+    
 class UserViewSet(InternalAPIViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -74,6 +76,8 @@ class UserViewSet(InternalAPIViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
+    
+    
 class GroupViewSet(InternalAPIViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
@@ -90,8 +94,8 @@ class ActionMapViewSet(InternalAPIViewSet):
     permission_classes = [permissions.AllowAny]
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = ActionMapFilter
-
-
+    
+    
 CoachStatesFilter = UniversalFilter.create_filter(CoachStates)
 class CoachStatesViewSet(InternalAPIViewSet):
     queryset = CoachStates.objects.all()

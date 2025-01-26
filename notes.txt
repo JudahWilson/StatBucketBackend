@@ -1,5 +1,4 @@
-create "metabase" folder
-place metabase.jar file in the folder, 
+
 double click to run
 
 AT metabase FOLDER: ngrok http --domain=judahwilson.ngrok.io 3000
