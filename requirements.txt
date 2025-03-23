@@ -13,7 +13,6 @@ drf-spectacular==0.27.0
 idna==3.6
 inflection==0.5.1
 itypes==1.2.0
-Jinja2==3.1.2
 jsonschema==4.20.0
 jsonschema-specifications==2023.12.1
 MarkupSafe==2.1.3

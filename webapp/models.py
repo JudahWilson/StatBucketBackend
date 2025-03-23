@@ -80,6 +80,7 @@ class Coaches(models.Model):
 
 class Games(models.Model):
     br_id = models.CharField(max_length=12, blank=True, null=True)
+    season_br_id = models.CharField(max_length=8, blank=True, null=True)
     home_team_br_id = models.CharField(max_length=3, blank=True, null=True)
     away_team_br_id = models.CharField(max_length=3, blank=True, null=True)
     home_team_points = models.IntegerField(blank=True, null=True)
@@ -345,6 +346,8 @@ class Plays(models.Model):
     quarter = models.IntegerField(blank=True, null=True)
     clock_time = models.CharField(max_length=7, blank=True, null=True)
     distance_feet = models.IntegerField(blank=True, null=True)
+    home_score: int
+    away_score: int
 
     class Meta:
         managed = False
