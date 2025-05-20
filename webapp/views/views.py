@@ -3,9 +3,9 @@ from django.http import HttpResponse
 
 
 # Create your views here.
-def home(request):
+def index(request):
     # return html string rendered by django not using a template
-    return render(request, 'home.html', {'title': 'Hello HTMX and Django'})
+    return render(request, 'index.html', {'title': 'Hello HTMX and Django'})
     
 def htmx(request):
     # generate random float

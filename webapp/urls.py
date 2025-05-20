@@ -1,5 +1,5 @@
 from django.urls import include, path
-from .views import api_views_standard, views, htmx_views
+from .views import api_views, views, htmx_views
 # For css and js
 from django.conf.urls.static import static
 from django.conf import settings
@@ -32,7 +32,7 @@ router.register(r'Teams', api_views_standard.TeamsViewSet)
 
 
 urlpatterns = [
-    path('', views.home),
+    path('', views.index),
     
     ###############################
     # API
