@@ -537,9 +537,7 @@ class TeamGameStats(models.Model):
 class Teams(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
     br_id = models.CharField(max_length=3, blank=True, null=True)
-    nba = models.IntegerField(blank=True, null=True)
-    baa = models.IntegerField(blank=True, null=True)
-    aba = models.IntegerField(blank=True, null=True)
+    league = models.CharField(max_length=3, blank=True, null=True)
     season_start_year = models.CharField(max_length=4, blank=True, null=True)
     season_end_year = models.CharField(max_length=4, blank=True, null=True)
     location = models.CharField(max_length=30, blank=True, null=True)
