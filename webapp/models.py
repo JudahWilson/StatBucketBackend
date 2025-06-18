@@ -46,6 +46,7 @@ class ActionMap(models.Model):
         db_table = 'ActionMap'
         verbose_name_plural = 'Action Map'
 
+
 class CoachStates(models.Model):
     coach_br_id = models.CharField(max_length=10, blank=True, null=True)
     team_br_id = models.CharField(max_length=3, blank=True, null=True)
@@ -78,6 +79,7 @@ class Coaches(models.Model):
         db_table = 'Coaches'
         verbose_name_plural = 'Coaches'
 
+
 class Games(models.Model):
     br_id = models.CharField(max_length=12, blank=True, null=True)
     season_br_id = models.CharField(max_length=8, blank=True, null=True)
@@ -102,6 +104,7 @@ class Games(models.Model):
 
     def __str__(self):
         return self.date_time.strftime("%Y-%m-%d %H:%M:%S") + ' - ' + self.home_team_br_id + ' vs ' + self.away_team_br_id
+
 
 class PlayActions(models.Model):
     play_id = models.IntegerField(blank=True, null=True)
@@ -207,6 +210,7 @@ class PlayerGameQuarterStats(models.Model):
         managed = False
         db_table = 'PlayerGameQuarterStats'
         verbose_name_plural = 'Player Game Quarter Stats'
+
         
 class PlayerGameOvertimeStats(models.Model):
     player_br_id = models.CharField(max_length=9, blank=True, null=True)
