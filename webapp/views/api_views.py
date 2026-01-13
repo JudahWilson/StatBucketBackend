@@ -159,6 +159,15 @@ class PlayerGameQuarterStatsViewSet(InternalAPIViewSet):
     filterset_class = PlayerGameQuarterStatsFilter
 
 
+PlayerGameOvertimeStatsFilter = UniversalFilter.create_filter(PlayerGameOvertimeStats)
+class PlayerGameOvertimeStatsViewSet(InternalAPIViewSet):
+    queryset = PlayerGameOvertimeStats.objects.all()
+    serializer_class = PlayerGameOvertimeStatsSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = PlayerGameOvertimeStatsFilter
+
+
 PlayerGameStatsFilter = UniversalFilter.create_filter(PlayerGameStats)
 class PlayerGameStatsViewSet(InternalAPIViewSet):
     queryset = PlayerGameStats.objects.all()
@@ -220,6 +229,15 @@ class TeamGameQuarterStatsViewSet(InternalAPIViewSet):
     permission_classes = [permissions.AllowAny]
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = TeamGameQuarterStatsFilter
+
+
+TeamGameOvertimeStatsFilter = UniversalFilter.create_filter(TeamGameOvertimeStats)
+class TeamGameOvertimeStatsViewSet(InternalAPIViewSet):
+    queryset = TeamGameOvertimeStats.objects.all()
+    serializer_class = TeamGameOvertimeStatsSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = TeamGameOvertimeStatsFilter
 
 
 TeamGameStatsFilter = UniversalFilter.create_filter(TeamGameStats)
